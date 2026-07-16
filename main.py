@@ -31,10 +31,10 @@ def read_urls(file):
 def requests_urls(urls):
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
     try:
-        req = requests.get(urls, header=headers, timeout=10)
+        req = requests.get(urls, headers=headers, timeout=10)
+        return req.url
     except:
         pass
-    pass
 
 if __name__ == "__main__":
     main()
