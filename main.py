@@ -10,7 +10,12 @@ parser.add_argument("-o", "--output", help="Save urls in file. Example: -o urls.
 args = parser.parse_args()
 
 def main():
-    pass
+    urls = read_urls(args.list)
+
+def read_urls(file):
+    file_read = open(file, encoding="utf-8").read().splitlines()
+    result = list(dict.fromkeys(file_read))
+    return result
 
 if __name__ == "__main__":
     main()
