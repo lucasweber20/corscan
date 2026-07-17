@@ -1,6 +1,7 @@
 import requests
 import argparse
 import concurrent.futures
+import time
 
 
 parser = argparse.ArgumentParser()
@@ -21,7 +22,16 @@ def main():
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.thread) as executor:
         futures = [executor.submit(requests_urls, url) for url in urls]
         for future in concurrent.futures.as_completed(futures):
-            print(future.result())
+            result = future.result()
+            try:
+                if "evil.com" in result[1] and "true" in result[2]:
+                    print(f"Vulnerable: {result[0]}")
+                elif "evil.com" in result[1] and not result[2] or "*" in result[2]:
+                    print(f"ACAO reflected, but not vulnerable: {result[0]}")
+                else:
+                    continue
+            except:
+                continue
 
 def read_urls(file):
     file_read = open(file, encoding="utf-8").read().splitlines()
@@ -29,10 +39,13 @@ def read_urls(file):
     return result
 
 def requests_urls(urls):
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+               "Origin": "https://evil.com"}
     try:
         req = requests.get(urls, headers=headers, timeout=10)
-        return req.url
+        acao = req.headers.get("Access-Control-Allow-Origin")
+        acac = req.headers.get("Access-Control-Allow-Credentials")
+        return urls, acao, acac
     except:
         pass
 
